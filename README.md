@@ -34,7 +34,7 @@ https://docs.flutter.dev/get-started/install
 Clone o projeto usando Git:
 
 ```bash
-https://github.com/caua-dias/ConectaServ.git
+git clone https://github.com/caua-dias/ConectaServ.git
 ```
 
 Entre na pasta do projeto:
