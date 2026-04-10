@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 // Substitua "seu_projeto" pelo nome do seu pacote
-import 'package:conecta_serv/models/Cliente.dart';
+import 'package:conecta_serv/models/cliente.dart';
 import 'package:conecta_serv/models/enums.dart';
 
 void main() {
