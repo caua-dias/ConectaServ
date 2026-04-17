@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import '../features/auth/presentation/pages/login_page.dart';
 import '../features/auth/presentation/pages/register_screen.dart';
+import '../features/auth/presentation/pages/service_screen.dart';
 
 final GoRouter router = GoRouter(
     initialLocation: '/',
@@ -13,6 +14,10 @@ final GoRouter router = GoRouter(
         GoRoute(
             path: '/register',
             builder: (context, state) => const RegisterScreen(),
+        ),
+        GoRoute(
+            path: '/service',
+            builder: (context, state) => const ServiceScreen(),
         ),
     ],
 );
