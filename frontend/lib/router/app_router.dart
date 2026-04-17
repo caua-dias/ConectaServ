@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../features/auth/presentation/pages/login_page.dart';
 import '../features/auth/presentation/pages/register_screen.dart';
 
-final GoRouter _router = GoRouter(
+final GoRouter router = GoRouter(
     initialLocation: '/',
     routes: [
         // GoRoute define uma rota com um path (URL) e um builder (widget a exibir).
