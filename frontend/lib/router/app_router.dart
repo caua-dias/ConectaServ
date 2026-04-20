@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import '../features/auth/presentation/pages/login_page.dart';
 import '../features/auth/presentation/pages/register_screen.dart';
 import '../features/auth/presentation/pages/service_screen.dart';
+import '../features/auth/presentation/pages/raiting_screen.dart';
 
 final GoRouter router = GoRouter(
     initialLocation: '/',
@@ -18,6 +19,10 @@ final GoRouter router = GoRouter(
         GoRoute(
             path: '/service',
             builder: (context, state) => const ServiceScreen(),
+        ),
+        GoRoute(
+            path: '/raiting',
+            builder: (context, state) => const RaitingScreen(),
         ),
     ],
 );
