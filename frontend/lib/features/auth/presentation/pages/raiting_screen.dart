@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
+import 'package:go_router/go_router.dart'; // Importante para o context.go
 
 /// Classe estruturada para representar o Payload que será enviado ao backend Flask.
 class AvaliacaoPayload {
@@ -70,16 +71,17 @@ class AvaliacaoScreen extends StatefulWidget {
   State<AvaliacaoScreen> createState() => _AvaliacaoScreenState();
 }
 
-class _AvaliacaoScreenState extends State<AvaliacaoScreen> with SingleTickerProviderStateMixin {
+class _AvaliacaoScreenState extends State<AvaliacaoScreen>
+    with SingleTickerProviderStateMixin {
   int _nota = 0;
   final TextEditingController _comentarioController = TextEditingController();
-  
+
   // Opções para os chips de seleção rápida
   final List<String> _opcoesAvaliacao = [
-    "Rápido", 
-    "Atencioso", 
-    "Preço Justo", 
-    "Qualidade", 
+    "Rápido",
+    "Atencioso",
+    "Preço Justo",
+    "Qualidade",
     "Recomendaria"
   ];
   final Set<String> _selecoes = {};
@@ -102,13 +104,13 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> with SingleTickerProv
     );
 
     final jsonString = jsonEncode(payload.toJson());
-    
+
     print("--- INÍCIO DO PAYLOAD JSON (FLASK) ---");
     print(jsonString);
     print("--- FIM DO PAYLOAD ---");
 
     ScaffoldMessenger.of(context).showSnackBar(
-       SnackBar(
+      SnackBar(
         content: Row(
           children: const [
             Icon(Icons.check_circle, color: Colors.white),
@@ -136,31 +138,35 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> with SingleTickerProv
             });
           },
           child: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOutCubic,
-            padding: const EdgeInsets.symmetric(horizontal: 6.0),
-            child: TweenAnimationBuilder<double>(
-               tween: Tween<double>(begin: 0, end: isSelected ? 1.0 : 0.0),
-               duration: const Duration(milliseconds: 300),
-               builder: (context, value, child) {
-                 return Transform.scale(
-                   scale: 1.0 + (value * 0.15),
-                   child: Icon(
-                     isSelected ? Icons.star_rounded : Icons.star_outline_rounded,
-                     color: isSelected ? Colors.amber.shade400 : Colors.grey.shade300,
-                     size: 48,
-                     shadows: isSelected ? [
-                       Shadow(
-                         color: Colors.amber.withOpacity(0.4),
-                         blurRadius: 12,
-                         offset: const Offset(0, 4)
-                       )
-                     ] : [],
-                   ),
-                 );
-               },
-            )
-          ),
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOutCubic,
+              padding: const EdgeInsets.symmetric(horizontal: 6.0),
+              child: TweenAnimationBuilder<double>(
+                tween: Tween<double>(begin: 0, end: isSelected ? 1.0 : 0.0),
+                duration: const Duration(milliseconds: 300),
+                builder: (context, value, child) {
+                  return Transform.scale(
+                    scale: 1.0 + (value * 0.15),
+                    child: Icon(
+                      isSelected
+                          ? Icons.star_rounded
+                          : Icons.star_outline_rounded,
+                      color: isSelected
+                          ? Colors.amber.shade400
+                          : Colors.grey.shade300,
+                      size: 48,
+                      shadows: isSelected
+                          ? [
+                              Shadow(
+                                  color: Colors.amber.withOpacity(0.4),
+                                  blurRadius: 12,
+                                  offset: const Offset(0, 4))
+                            ]
+                          : [],
+                    ),
+                  );
+                },
+              )),
         );
       }),
     );
@@ -169,7 +175,8 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> with SingleTickerProv
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50, // Fundo levemente acinzentado e moderno
+      backgroundColor:
+          Colors.grey.shade50, // Fundo levemente acinzentado e moderno
       appBar: AppBar(
         title: const Text(
           'Avaliação de Serviço',
@@ -184,12 +191,11 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> with SingleTickerProv
       body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
-            // Container responsivo (LayoutBuilder + ConstrainedBox limitam para não esticar demais)
             return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
               child: Center(
                 child: ConstrainedBox(
-                  // Em telas grandes (Desktop/Tablets), limita o tamanho máximo criando um efeito "Card"
                   constraints: const BoxConstraints(maxWidth: 600),
                   child: Container(
                     padding: const EdgeInsets.all(32.0),
@@ -198,7 +204,10 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> with SingleTickerProv
                       borderRadius: BorderRadius.circular(28),
                       boxShadow: [
                         BoxShadow(
-                          color: Theme.of(context).colorScheme.primary.withOpacity(0.04),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .primary
+                              .withOpacity(0.04),
                           blurRadius: 24,
                           offset: const Offset(0, 12),
                         ),
@@ -207,12 +216,15 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> with SingleTickerProv
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // Cabeçalho estilizado
                         Container(
-                          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 20, horizontal: 16),
                           decoration: BoxDecoration(
-                             color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.4),
-                             borderRadius: BorderRadius.circular(20),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .primaryContainer
+                                .withOpacity(0.4),
+                            borderRadius: BorderRadius.circular(20),
                           ),
                           child: Column(
                             children: [
@@ -230,7 +242,9 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> with SingleTickerProv
                               Text(
                                 widget.nomeServico,
                                 style: TextStyle(
-                                  color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onPrimaryContainer,
                                   fontSize: 22,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -240,8 +254,6 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> with SingleTickerProv
                           ),
                         ),
                         const SizedBox(height: 36),
-
-                        // Pergunta Central
                         const Text(
                           'O que achou do serviço?',
                           style: TextStyle(
@@ -255,8 +267,6 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> with SingleTickerProv
                         const SizedBox(height: 24),
                         _buildRatingBar(),
                         const SizedBox(height: 40),
-
-                        // Seção de feedback rápido
                         const Text(
                           'Compartilhe a sua experiência',
                           style: TextStyle(
@@ -267,8 +277,6 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> with SingleTickerProv
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 20),
-                        
-                        // Chips de seleção
                         Wrap(
                           spacing: 12.0,
                           runSpacing: 12.0,
@@ -279,8 +287,11 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> with SingleTickerProv
                               label: Text(
                                 opcao,
                                 style: TextStyle(
-                                  color: isSelected ? Colors.white : Colors.black87,
-                                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                                  color:
+                                      isSelected ? Colors.white : Colors.black87,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w600
+                                      : FontWeight.w500,
                                 ),
                               ),
                               selected: isSelected,
@@ -294,24 +305,24 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> with SingleTickerProv
                                 });
                               },
                               backgroundColor: Colors.grey.shade100,
-                              selectedColor: Theme.of(context).colorScheme.primary,
+                              selectedColor:
+                                  Theme.of(context).colorScheme.primary,
                               showCheckmark: isSelected,
                               checkmarkColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(24),
                                 side: BorderSide(
-                                  color: isSelected 
-                                    ? Theme.of(context).colorScheme.primary 
-                                    : Colors.grey.shade200,
+                                  color: isSelected
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Colors.grey.shade200,
                                 ),
                               ),
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
                             );
                           }).toList(),
                         ),
                         const SizedBox(height: 40),
-
-                        // Campo de texto
                         const Text(
                           'Detalhamento (opcional)',
                           style: TextStyle(
@@ -327,8 +338,10 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> with SingleTickerProv
                           maxLines: 5,
                           textInputAction: TextInputAction.done,
                           decoration: InputDecoration(
-                            hintText: 'Escreva detalhes sobre o atendimento, qualidade...',
-                            hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 15),
+                            hintText:
+                                'Escreva detalhes sobre o atendimento, qualidade...',
+                            hintStyle: TextStyle(
+                                color: Colors.grey.shade400, fontSize: 15),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(16),
                               borderSide: BorderSide(color: Colors.grey.shade300),
@@ -350,19 +363,21 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> with SingleTickerProv
                           ),
                         ),
                         const SizedBox(height: 40),
-
-                        // Botão de Enviar
                         ElevatedButton(
                           onPressed: _nota > 0 ? _enviarAvaliacao : null,
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 20),
-                            backgroundColor: Theme.of(context).colorScheme.primary,
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary,
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
                             elevation: _nota > 0 ? 6 : 0,
-                            shadowColor: Theme.of(context).colorScheme.primary.withOpacity(0.4),
+                            shadowColor: Theme.of(context)
+                                .colorScheme
+                                .primary
+                                .withOpacity(0.4),
                             disabledBackgroundColor: Colors.grey.shade200,
                             disabledForegroundColor: Colors.grey.shade400,
                           ),
@@ -383,6 +398,33 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> with SingleTickerProv
             );
           },
         ),
+      ),
+      // --- RODAPÉ ADICIONADO AQUI ---
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 0, // Home selecionada por padrão
+        onTap: (index) {
+          if (index == 0) {
+            context.go('/home'); // Vai para a própria landing page
+          } else if (index == 1) {
+            context.go('/service'); // rota para a pagina de servicos
+          } else if (index == 2) {
+            print('Ir para Perfil (Rota não criada)');
+          }
+        },
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.build_circle_outlined),
+            label: 'Serviços',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            label: 'Conta',
+          ),
+        ],
       ),
     );
   }

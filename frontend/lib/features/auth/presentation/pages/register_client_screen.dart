@@ -1,41 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../auth_service.dart'; // Importe o AuthService para usar no login
-
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class RegisterClientScreen extends StatefulWidget {
+  const RegisterClientScreen({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterClientScreen> createState() => _RegisterClientScreenState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterClientScreenState extends State<RegisterClientScreen> {
   bool _senhaVisivel = true;
   bool _visivel = false;
 
   @override
   void initState() {
     super.initState();
-    // Dispara a animação após o primeiro frame
     Future.delayed(const Duration(milliseconds: 100), () {
       if (mounted) setState(() => _visivel = true);
     });
   }
 
-  void _handleLogin() {
-    print("Login clicado");
-    authService.login(); // Marca o usuário como autenticado
-    context.go('/'); // Navega para a Home após o login
+  void _handleRegister() {
+    print("Cadastro de Cliente clicado");
   }
 
-  /// Widget helper para fade-in escalonado
   Widget _fadeIn({required Widget child, required int ordem}) {
     return AnimatedOpacity(
       opacity: _visivel ? 1.0 : 0.0,
       duration: const Duration(milliseconds: 500),
       curve: Curves.easeOut,
-      // Cada item atrasa 120ms a mais que o anterior
       child: AnimatedSlide(
         offset: _visivel ? Offset.zero : const Offset(0, 0.08),
         duration: Duration(milliseconds: 500 + (ordem * 120)),
@@ -48,56 +41,53 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => context.pop(),
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 64),
-
-                // Logo com scale
-                AnimatedScale(
-                  scale: _visivel ? 1.0 : 0.6,
-                  duration: const Duration(milliseconds: 600),
-                  curve: Curves.elasticOut,
-                  child: AnimatedOpacity(
-                    opacity: _visivel ? 1.0 : 0.0,
-                    duration: const Duration(milliseconds: 400),
-                    child: Center(
-                      child: Image.asset('assets/login.jpg', height: 250),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 40),
-
                 _fadeIn(
                   ordem: 1,
                   child: Text(
-                    'Bem-vindo de volta',
+                    'Criar Conta - Cliente',
                     style: Theme.of(context)
                         .textTheme
                         .headlineSmall
                         ?.copyWith(fontWeight: FontWeight.bold),
                   ),
                 ),
-
                 const SizedBox(height: 8),
-
                 _fadeIn(
                   ordem: 2,
                   child: Text(
-                    'Acesse sua conta para continuar',
+                    'Preencha os dados para se cadastrar.',
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ),
-
                 const SizedBox(height: 32),
-
                 _fadeIn(
                   ordem: 3,
+                  child: const TextField(
+                    decoration: InputDecoration(
+                      labelText: 'CPF ou CNPJ',
+                      prefixIcon: Icon(Icons.badge_outlined),
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _fadeIn(
+                  ordem: 4,
                   child: const TextField(
                     decoration: InputDecoration(
                       labelText: 'E-mail',
@@ -106,11 +96,9 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 16),
-
                 _fadeIn(
-                  ordem: 4,
+                  ordem: 5,
                   child: TextField(
                     obscureText: _senhaVisivel,
                     decoration: InputDecoration(
@@ -136,45 +124,12 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-
-                const SizedBox(height: 8),
-
-                _fadeIn(
-                  ordem: 5,
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {},
-                      child: const Text('Esqueci minha senha'),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
+                const SizedBox(height: 32),
                 _fadeIn(
                   ordem: 6,
                   child: ElevatedButton(
-                    onPressed: _handleLogin,
-                    child: const Text('Entrar'),
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                _fadeIn(
-                  ordem: 7,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text('Não tem conta? '),
-                      TextButton(
-                        onPressed: () {
-                          context.go('/register');
-                        },
-                        child: const Text('Cadastre-se'),
-                      ),
-                    ],
+                    onPressed: _handleRegister,
+                    child: const Text('Cadastrar'),
                   ),
                 ),
               ],

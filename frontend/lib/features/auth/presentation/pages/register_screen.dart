@@ -17,7 +17,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: LayoutBuilder(
-        // Adicionado para garantir o cálculo de tamanho
         builder: (context, constraints) {
           return SingleChildScrollView(
             child: ConstrainedBox(
@@ -26,8 +25,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 padding: const EdgeInsets.symmetric(
                     horizontal: 24.0, vertical: 48.0),
                 child: Column(
-                  mainAxisAlignment:
-                      MainAxisAlignment.center, // Centraliza os itens
+                  mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     _buildRegisterSection(
@@ -37,6 +35,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       isHovered: _clientHovered,
                       onHover: (hovered) =>
                           setState(() => _clientHovered = hovered),
+                      onTap: () => context.push('/register_client'),
                     ),
                     const SizedBox(height: 48),
                     _buildRegisterSection(
@@ -46,14 +45,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       isHovered: _companyHovered,
                       onHover: (hovered) =>
                           setState(() => _companyHovered = hovered),
+                      onTap: () => context.push('/register_company'),
                     ),
-
-                    const SizedBox(height: 40), // SUBSTITUI O SPACER
-
+                    const SizedBox(height: 40),
                     Center(
                       child: TextButton(
-                        onPressed: () =>
-                            context.go('/'), // Use context.go do GoRouter
+                        onPressed: () => context.go('/login'),
                         child: const Text(
                           'Retornar para o login',
                           style: TextStyle(
@@ -79,6 +76,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     required String imageUrl,
     required bool isHovered,
     required ValueChanged<bool> onHover,
+    required VoidCallback onTap,
   }) {
     return Column(
       children: [
@@ -96,9 +94,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           onEnter: (_) => onHover(true),
           onExit: (_) => onHover(false),
           child: GestureDetector(
-            onTap: () {
-              print('Selecionado registro de: $title');
-            },
+            onTap: onTap,
             child: AnimatedScale(
               scale: isHovered ? 1.15 : 1.0,
               duration: const Duration(milliseconds: 200),
