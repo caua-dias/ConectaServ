@@ -6,6 +6,7 @@ import '../features/auth/presentation/pages/raiting_screen.dart';
 import '../features/auth/presentation/pages/register_client_screen.dart';
 import '../features/auth/presentation/pages/register_company_screen.dart';
 import '../features/auth/presentation/pages/home_page.dart';
+import '../features/auth/presentation/pages/recover_password_page.dart';
 
 import '../features/auth/auth_service.dart'; 
 
@@ -62,5 +63,9 @@ final GoRouter router = GoRouter(
             path: '/raiting',
             builder: (context, state) => const RaitingScreen(),
         ),
+        GoRoute(
+            path: '/recover_password',
+            builder: (context, state) => const RecoverPasswordPage(),
+        )
     ],
 );
