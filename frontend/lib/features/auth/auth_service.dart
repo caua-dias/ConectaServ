@@ -1,20 +1,12 @@
-import 'package:flutter/material.dart';
-
-class AuthService extends ChangeNotifier {
-  bool _isAuthenticated = false;
-  
-  bool get isAuthenticated => _isAuthenticated;
-
-  void login() {
-    _isAuthenticated = true;
-    notifyListeners(); // Avisa o GoRouter que o estado mudou
+class AuthService {
+  // Aqui futuramente você conectará com seu backend ou Firebase
+  Future<bool> fazerLogin(String email, String senha) async {
+    // Simulando um tempo de processamento de rede
+    await Future.delayed(const Duration(seconds: 2));
+    return true; // Simula que o login deu certo
   }
 
-  void logout() {
-    _isAuthenticated = false;
-    notifyListeners(); // Avisa o GoRouter que o estado mudou
+  Future<void> fazerLogout() async {
+    await Future.delayed(const Duration(seconds: 1));
   }
 }
-
-// Criamos uma instância global para facilitar o acesso no Router e no Login
-final authService = AuthService();

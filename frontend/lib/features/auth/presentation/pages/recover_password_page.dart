@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-// IMPORTANTE: Adicione o pacote no seu pubspec.yaml (flutter pub add loading_overlay)
 import 'package:loading_overlay/loading_overlay.dart';
+import 'package:provider/provider.dart';
+
+import '../../auth_notifier.dart';
 
 class RecoverPasswordPage extends StatefulWidget {
   const RecoverPasswordPage({super.key});

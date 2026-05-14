@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:go_router/go_router.dart';
-// IMPORTANTE: Adicione o pacote no seu pubspec.yaml (flutter pub add loading_overlay)
 import 'package:loading_overlay/loading_overlay.dart';
+import 'package:provider/provider.dart';
+
+import '../../auth_notifier.dart';
 
 /// Classe estruturada para representar o Payload que será enviado ao backend Flask.
 class AvaliacaoPayload {

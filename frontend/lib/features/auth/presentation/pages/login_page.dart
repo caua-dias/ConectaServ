@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-// IMPORTANTE: Adicione o pacote no seu pubspec.yaml (flutter pub add loading_overlay)
-import 'package:loading_overlay/loading_overlay.dart'; 
+import 'package:loading_overlay/loading_overlay.dart';
+import 'package:provider/provider.dart'; // NOVO: Import do Provider
 
-import '../../auth_service.dart';
+// IMPORTANTE: Ajuste o caminho de acordo com a sua estrutura de pastas
+import '../../auth_notifier.dart'; 
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -15,7 +16,9 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   bool _senhaVisivel = true;
   bool _visivel = false;
-  bool _carregando = false;
+  
+  // REMOVIDO: bool _carregando = false; 
+  // O estado de carregamento agora é gerenciado pelo ViewModel (AuthNotifier)
 
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
@@ -42,11 +45,14 @@ class _LoginPageState extends State<LoginPage> {
     if (!_formKey.currentState!.validate()) return;
     
     FocusScope.of(context).unfocus();
-    setState(() => _carregando = true);
 
     try {
-      await Future.delayed(const Duration(seconds: 2));
-      authService.login();
+      // NOVO: Usando context.read() para despachar a intenção para o ViewModel
+      // O AuthNotifier irá internamente alterar o estado de "carregando" e notificar a View
+      await context.read<AuthNotifier>().login(
+        _emailController.text,
+        _senhaController.text,
+      );
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -66,19 +72,15 @@ class _LoginPageState extends State<LoginPage> {
           ),
         );
       }
-    } finally {
-      if (mounted) setState(() => _carregando = false);
     }
   }
 
-  // --- NOVO: Método para exibir o AlertDialog ---
   Future<void> _mostrarDialogoEsqueciSenha() async {
-    // Usamos o TextFormField do e-mail para preencher o dialog, se já estiver digitado
     final emailAtual = _emailController.text;
 
     await showDialog(
       context: context,
-      barrierDismissible: false, // Obriga o usuário a escolher uma das opções nos botões
+      barrierDismissible: false,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
           title: const Text('Recuperar Senha'),
@@ -88,7 +90,7 @@ class _LoginPageState extends State<LoginPage> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(dialogContext).pop(); // Fecha o dialog
+                Navigator.of(dialogContext).pop();
               },
               child: Text(emailAtual.isNotEmpty ? 'Cancelar' : 'OK, entendi'),
             ),
@@ -96,7 +98,6 @@ class _LoginPageState extends State<LoginPage> {
               ElevatedButton(
                 onPressed: () {
                   Navigator.of(dialogContext).pop();
-                  // Aqui iria a lógica para chamar a API de esqueci a senha
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Link de recuperação enviado!')),
                   );
@@ -125,9 +126,12 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    // --- NOVO: LoadingOverlay envolvendo o Scaffold ---
+    // NOVO: Escutando ativamente as mudanças de estado do ViewModel
+    final authNotifier = context.watch<AuthNotifier>();
+
     return LoadingOverlay(
-      isLoading: _carregando,
+      // NOVO: Consumindo a variável _carregando gerenciada pelo AuthNotifier
+      isLoading: authNotifier.carregando, 
       color: Colors.black.withOpacity(0.5),
       progressIndicator: const CircularProgressIndicator(color: Colors.orange),
       child: Scaffold(
@@ -229,10 +233,7 @@ class _LoginPageState extends State<LoginPage> {
                         alignment: Alignment.centerRight,
                         child: TextButton(
                           onPressed: () {
-                            // Primeiro executa a lógica do diálogo (se necessário)
                             _mostrarDialogoEsqueciSenha(); 
-                            
-                            // Em seguida, navega para a rota desejada
                             context.go('/recover_password');
                           },
                           child: const Text('Esqueci minha senha'),
@@ -243,7 +244,6 @@ class _LoginPageState extends State<LoginPage> {
                     _fadeIn(
                       ordem: 6,
                       child: ElevatedButton(
-                        // O botão agora fica bem mais limpo pois o loading está no overlay
                         onPressed: _handleLogin, 
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
