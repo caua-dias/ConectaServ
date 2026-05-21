@@ -1,5 +1,5 @@
 import 'package:get_it/get_it.dart';
-import '../features/auth/auth_service.dart'; // Ajuste o caminho para onde está o seu AuthService
+import '../../features/auth/auth_service.dart'; // Ajuste o caminho para onde está o seu AuthService
 
 final sl = GetIt.instance; // sl = Service Locator
 

@@ -3,7 +3,7 @@ import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:provider/provider.dart'; // Pacote do Provider
 
 import 'router/app_router.dart';
-import 'core/injecao.dart'; // Importe o arquivo de injeção que acabamos de criar
+import 'core/di/injecao.dart'; // Importe o arquivo de injeção que acabamos de criar
 import 'features/auth/auth_notifier.dart'; // Importe o ViewModel (Notifier)
 import 'features/auth/auth_service.dart'; // Importe o Serviço para o sl<AuthService>() funcionar
 
