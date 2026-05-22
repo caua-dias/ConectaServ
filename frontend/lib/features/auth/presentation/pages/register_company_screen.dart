@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import '../../auth_notifier.dart';
+import '../../../models/presentation/notifiers/empresa_prestadora_notifier.dart';
+import '../../../../models/empresa_prestadora.dart';
+import '../../../../models/enums.dart';
 
 class RegisterCompanyScreen extends StatefulWidget {
   const RegisterCompanyScreen({super.key});
@@ -18,12 +20,24 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
   bool _visivel = false;
   bool _isLoading = false;
 
+  final _cnpjController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _senhaController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
     Future.delayed(const Duration(milliseconds: 100), () {
       if (mounted) setState(() => _visivel = true);
     });
+  }
+
+  @override
+  void dispose() {
+    _cnpjController.dispose();
+    _emailController.dispose();
+    _senhaController.dispose();
+    super.dispose();
   }
 
   void _showSnackBar(String mensagem, {bool isError = false}) {
@@ -62,13 +76,25 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
 
-      // Simulação de delay da API
-      await Future.delayed(const Duration(seconds: 2));
+      try {
+        final empresa = EmpresaPrestadora(
+          cnpj: _cnpjController?.text ?? '',
+          statusCuradoria: StatusCuradoria.emAnalise,
+          reputacao: '0',
+        );
 
-      if (mounted) {
-        setState(() => _isLoading = false);
-        _showSnackBar("Cadastro empresarial realizado!");
-        _showSuccessDialog();
+        await context.read<EmpresaPrestadoraNotifier>().salvar(empresa);
+
+        if (mounted) {
+          setState(() => _isLoading = false);
+          _showSnackBar("Cadastro empresarial realizado!");
+          _showSuccessDialog();
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() => _isLoading = false);
+          _showSnackBar("Erro ao salvar empresa: $e", isError: true);
+        }
       }
     } else {
       _showSnackBar("Verifique as informações do formulário", isError: true);
@@ -133,6 +159,7 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
                       _fadeIn(
                         ordem: 3,
                         child: TextFormField(
+                          controller: _cnpjController,
                           keyboardType: TextInputType.number,
                           decoration: const InputDecoration(
                             labelText: 'CNPJ',
@@ -156,6 +183,7 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
                       _fadeIn(
                         ordem: 4,
                         child: TextFormField(
+                          controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           decoration: const InputDecoration(
                             labelText: 'E-mail Corporativo',
@@ -177,6 +205,7 @@ class _RegisterCompanyScreenState extends State<RegisterCompanyScreen> {
                       _fadeIn(
                         ordem: 5,
                         child: TextFormField(
+                          controller: _senhaController,
                           obscureText: _senhaVisivel,
                           decoration: InputDecoration(
                             labelText: 'Senha',

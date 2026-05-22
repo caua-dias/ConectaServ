@@ -1,19 +1,35 @@
 import 'enums.dart';
 
 class Cliente {
-  final int idCliente;
+  final int? idCliente;
   final TipoCliente tipo;
   final String cpfCnpj;
 
   const Cliente({
-    required this.idCliente,
+    this.idCliente,
     required this.tipo,
     required this.cpfCnpj,
   });
 
+  Map<String, dynamic> toMap() {
+    return {
+      if (idCliente != null) 'id_cliente': idCliente,
+      'tipo': tipo.name,
+      'cpf_cnpj': cpfCnpj,
+    };
+  }
+
+  factory Cliente.fromMap(Map<String, dynamic> map) {
+    return Cliente(
+      idCliente: map['id_cliente'] as int?,
+      tipo: TipoCliente.values.byName(map['tipo']),
+      cpfCnpj: map['cpf_cnpj'] as String,
+    );
+  }
+
   factory Cliente.fromJson(Map<String, dynamic> json) {
     return Cliente(
-      idCliente: json['idCliente'] as int,
+      idCliente: json['idCliente'] as int?,
       tipo: TipoCliente.values.byName(json['tipo']),
       cpfCnpj: json['cpfCnpj'] as String,
     );

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import '../../auth_notifier.dart';
+import '../../../models/presentation/notifiers/servico_notifier.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -22,6 +23,11 @@ class _HomePageState extends State<HomePage> {
     Future.delayed(const Duration(milliseconds: 100), () {
       if (mounted) setState(() => _visivel = true);
     });
+    
+    // Carrega serviços quando a página é inicializada
+    Future.microtask(
+      () => context.read<ServicoNotifier>().buscarTodos(),
+    );
   }
 
   Widget _fadeIn({required Widget child, required int ordem}) {

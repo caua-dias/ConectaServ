@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import '../../auth_notifier.dart';
+import '../../../models/presentation/notifiers/cliente_notifier.dart';
+import '../../../../models/cliente.dart';
+import '../../../../models/enums.dart';
 
 class RegisterClientScreen extends StatefulWidget {
   const RegisterClientScreen({super.key});
@@ -18,12 +20,24 @@ class _RegisterClientScreenState extends State<RegisterClientScreen> {
   bool _visivel = false;
   bool _isLoading = false;
 
+  final _cpfCnpjController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _senhaController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
     Future.delayed(const Duration(milliseconds: 100), () {
       if (mounted) setState(() => _visivel = true);
     });
+  }
+
+  @override
+  void dispose() {
+    _cpfCnpjController.dispose();
+    _emailController.dispose();
+    _senhaController.dispose();
+    super.dispose();
   }
 
   void _showSnackBar(String mensagem, {bool isError = false}) {
@@ -63,14 +77,24 @@ class _RegisterClientScreenState extends State<RegisterClientScreen> {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
 
-      // Simulação de requisição (ex: integração com AWS ou Firebase)
-      await Future.delayed(const Duration(seconds: 2));
+      try {
+        final cliente = Cliente(
+          tipo: TipoCliente.pessoaFisica,
+          cpfCnpj: _cpfCnpjController.text,
+        );
 
-      if (mounted) {
-        setState(() => _isLoading = false);
-        // Exibimos o snackbar e o dialog em sequência
-        _showSnackBar("Dados processados com sucesso!");
-        _showSuccessDialog();
+        await context.read<ClienteNotifier>().salvar(cliente);
+
+        if (mounted) {
+          setState(() => _isLoading = false);
+          _showSnackBar("Dados processados com sucesso!");
+          _showSuccessDialog();
+        }
+      } catch (e) {
+        if (mounted) {
+          setState(() => _isLoading = false);
+          _showSnackBar("Erro ao salvar cliente: $e", isError: true);
+        }
       }
     } else {
       _showSnackBar("Por favor, preencha os campos corretamente", isError: true);
@@ -135,6 +159,7 @@ class _RegisterClientScreenState extends State<RegisterClientScreen> {
                       _fadeIn(
                         ordem: 3,
                         child: TextFormField(
+                          controller: _cpfCnpjController,
                           decoration: const InputDecoration(
                             labelText: 'CPF ou CNPJ',
                             prefixIcon: Icon(Icons.badge_outlined),
@@ -161,6 +186,7 @@ class _RegisterClientScreenState extends State<RegisterClientScreen> {
                       _fadeIn(
                         ordem: 4,
                         child: TextFormField(
+                          controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           decoration: const InputDecoration(
                             labelText: 'E-mail',
@@ -182,6 +208,7 @@ class _RegisterClientScreenState extends State<RegisterClientScreen> {
                       _fadeIn(
                         ordem: 5,
                         child: TextFormField(
+                          controller: _senhaController,
                           obscureText: _senhaVisivel,
                           decoration: InputDecoration(
                             labelText: 'Senha',

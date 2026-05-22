@@ -10,7 +10,7 @@ import '../features/auth/presentation/pages/home_page.dart';
 import '../features/auth/presentation/pages/recover_password_page.dart';
 
 // IMPORTANTE: Importe o seu ViewModel em vez do AuthService
-import '../features/auth/auth_notifier.dart'; 
+import '../features/models/presentation/notifiers/auth_notifier.dart'; 
 
 /// Envolvemos o GoRouter em uma função para podermos injetar o ViewModel
 GoRouter criarRouter(AuthNotifier authNotifier) {

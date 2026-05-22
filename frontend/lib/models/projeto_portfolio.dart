@@ -1,17 +1,33 @@
 class ProjetoPortfolio {
-  final int idProjeto;
+  final int? idProjeto;
   final int idEmpresa;
   final String arquivo;
 
   const ProjetoPortfolio({
-    required this.idProjeto,
+    this.idProjeto,
     required this.idEmpresa,
     required this.arquivo,
   });
 
+  Map<String, dynamic> toMap() {
+    return {
+      if (idProjeto != null) 'id_projeto': idProjeto,
+      'id_empresa': idEmpresa,
+      'arquivo': arquivo,
+    };
+  }
+
+  factory ProjetoPortfolio.fromMap(Map<String, dynamic> map) {
+    return ProjetoPortfolio(
+      idProjeto: map['id_projeto'] as int?,
+      idEmpresa: map['id_empresa'] as int,
+      arquivo: map['arquivo'] as String,
+    );
+  }
+
   factory ProjetoPortfolio.fromJson(Map<String, dynamic> json) {
     return ProjetoPortfolio(
-      idProjeto: json['idProjeto'] as int,
+      idProjeto: json['idProjeto'] as int?,
       idEmpresa: json['idEmpresa'] as int,
       arquivo: json['arquivo'] as String,
     );

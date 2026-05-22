@@ -1,23 +1,43 @@
 import 'enums.dart';
 
 class Servico {
-  final int idServico;
+  final int? idServico;
   final int idEmpresa;
   final String descricao;
   final double preco;
   final Categoria categoria;
 
   const Servico({
-    required this.idServico,
+    this.idServico,
     required this.idEmpresa,
     required this.descricao,
     required this.preco,
     required this.categoria,
   });
 
+  Map<String, dynamic> toMap() {
+    return {
+      if (idServico != null) 'id_servico': idServico,
+      'id_empresa': idEmpresa,
+      'descricao': descricao,
+      'preco': preco,
+      'categoria': categoria.name,
+    };
+  }
+
+  factory Servico.fromMap(Map<String, dynamic> map) {
+    return Servico(
+      idServico: map['id_servico'] as int?,
+      idEmpresa: map['id_empresa'] as int,
+      descricao: map['descricao'] as String,
+      preco: (map['preco'] as num).toDouble(),
+      categoria: Categoria.values.byName(map['categoria']),
+    );
+  }
+
   factory Servico.fromJson(Map<String, dynamic> json) {
     return Servico(
-      idServico: json['idServico'] as int,
+      idServico: json['idServico'] as int?,
       idEmpresa: json['idEmpresa'] as int,
       descricao: json['descricao'] as String,
       preco: (json['preco'] as num).toDouble(),

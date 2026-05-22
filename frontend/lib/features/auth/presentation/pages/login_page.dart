@@ -4,7 +4,7 @@ import 'package:loading_overlay/loading_overlay.dart';
 import 'package:provider/provider.dart'; // NOVO: Import do Provider
 
 // IMPORTANTE: Ajuste o caminho de acordo com a sua estrutura de pastas
-import '../../auth_notifier.dart'; 
+import '../../../models/presentation/notifiers/auth_notifier.dart'; 
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

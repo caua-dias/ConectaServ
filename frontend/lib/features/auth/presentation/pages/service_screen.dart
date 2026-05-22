@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import '../../auth_notifier.dart';
+import '../../../models/presentation/notifiers/servico_notifier.dart';
 
 class ServiceScreen extends StatefulWidget {
   const ServiceScreen({super.key});
@@ -21,6 +21,11 @@ class _ServiceScreenState extends State<ServiceScreen> {
     Future.delayed(const Duration(milliseconds: 100), () {
       if (mounted) setState(() => _visivel = true);
     });
+    
+    // Carrega serviços
+    Future.microtask(
+      () => context.read<ServicoNotifier>().buscarTodos(),
+    );
   }
 
   /// Widget helper para fade-in escalonado, exatamente como na LoginPage

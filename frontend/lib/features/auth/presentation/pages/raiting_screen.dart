@@ -4,38 +4,29 @@ import 'package:go_router/go_router.dart';
 import 'package:loading_overlay/loading_overlay.dart';
 import 'package:provider/provider.dart';
 
-import '../../auth_notifier.dart';
+import '../../../models/presentation/notifiers/avaliacao_notifier.dart';
+import '../../../../models/avaliacao.dart';
 
-/// Classe estruturada para representar o Payload que será enviado ao backend Flask.
+/// Classe estruturada para representar a Avaliacao que será salva no banco de dados.
 class AvaliacaoPayload {
-  final String servico;
-  final int nota;
+  final int idContratacao;
+  final int estrelas;
   final List<String> comentariosRapidos;
   final String comentarioTexto;
-  final DateTime dataEnvio;
 
   AvaliacaoPayload({
-    required this.servico,
-    required this.nota,
+    required this.idContratacao,
+    required this.estrelas,
     required this.comentariosRapidos,
     required this.comentarioTexto,
-    required this.dataEnvio,
   });
-
-  AvaliacaoPayload.padrao({
-    required this.servico,
-    required this.nota,
-  })  : comentariosRapidos = [],
-        comentarioTexto = '',
-        dataEnvio = DateTime.now();
 
   Map<String, dynamic> toJson() {
     return {
-      'servico': servico,
-      'nota': nota,
-      'comentarios_rapidos': comentariosRapidos,
-      'comentario_texto': comentarioTexto,
-      'data_envio': dataEnvio.toIso8601String(),
+      'id_contratacao': idContratacao,
+      'estrelas': estrelas,
+      'comentarios': comentariosRapidos.join(', '),
+      'comentarios_texto': comentarioTexto,
     };
   }
 }
@@ -97,9 +88,14 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen>
   final Set<String> _selecoes = {};
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   void dispose() {
     _comentarioController.dispose();
-    _comentarioFocus.dispose(); // IMPORTANTE: Descartar FocusNode para evitar memory leak
+    _comentarioFocus.dispose();
     super.dispose();
   }
 
@@ -159,15 +155,23 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen>
       await Future.delayed(const Duration(seconds: 2));
 
       final payload = AvaliacaoPayload(
-        servico: widget.nomeServico,
-        nota: _nota,
+        idContratacao: 1, // TODO: Obter o ID da contratação corretamente
+        estrelas: _nota,
         comentariosRapidos: _selecoes.toList(),
         comentarioTexto: _comentarioController.text,
-        dataEnvio: DateTime.now(),
+      );
+
+      // Simular envio para o notifier
+      await context.read<AvaliacaoNotifier>().salvar(
+        Avaliacao(
+          idContratacao: payload.idContratacao,
+          estrelas: payload.estrelas,
+          comentarios: '${payload.comentariosRapidos.join(", ")} - ${payload.comentarioTexto}',
+        ),
       );
 
       final jsonString = jsonEncode(payload.toJson());
-      print("--- INÍCIO DO PAYLOAD JSON (FLASK) ---");
+      print("--- INÍCIO DO PAYLOAD JSON (SQLite/Backend) ---");
       print(jsonString);
       print("--- FIM DO PAYLOAD ---");
 

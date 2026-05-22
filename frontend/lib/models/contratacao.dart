@@ -1,21 +1,39 @@
 import 'enums.dart';
 
 class Contratacao {
-  final int idContratacao;
+  final int? idContratacao;
   final int idCliente;
   final int idServico;
   final StatusPagamento statusPagamento;
 
   const Contratacao({
-    required this.idContratacao,
+    this.idContratacao,
     required this.idCliente,
     required this.idServico,
     required this.statusPagamento,
   });
 
+  Map<String, dynamic> toMap() {
+    return {
+      if (idContratacao != null) 'id_contratacao': idContratacao,
+      'id_cliente': idCliente,
+      'id_servico': idServico,
+      'status_pagamento': statusPagamento.name,
+    };
+  }
+
+  factory Contratacao.fromMap(Map<String, dynamic> map) {
+    return Contratacao(
+      idContratacao: map['id_contratacao'] as int?,
+      idCliente: map['id_cliente'] as int,
+      idServico: map['id_servico'] as int,
+      statusPagamento: StatusPagamento.values.byName(map['status_pagamento']),
+    );
+  }
+
   factory Contratacao.fromJson(Map<String, dynamic> json) {
     return Contratacao(
-      idContratacao: json['idContratacao'] as int,
+      idContratacao: json['idContratacao'] as int?,
       idCliente: json['idCliente'] as int,
       idServico: json['idServico'] as int,
       statusPagamento: StatusPagamento.values.byName(json['statusPagamento']),
