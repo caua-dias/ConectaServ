@@ -1,7 +1,11 @@
 import 'package:get_it/get_it.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../../features/auth/auth_service.dart';
+// --- NOVAS IMPORTAÇÕES PARA A AUTENTICAÇÃO REAL ---
+import '../../core/http_client.dart';
+import '../../data/services/auth_service.dart';
+// --------------------------------------------------
+
 import '../../features/models/presentation/notifiers/cliente_notifier.dart';
 import '../../features/models/presentation/notifiers/servico_notifier.dart';
 import '../../features/models/presentation/notifiers/contratacao_notifier.dart';
@@ -19,13 +23,18 @@ import '../../infrastructure/repositories/sqflite_avaliacao_repository.dart';
 final sl = GetIt.instance; // sl = Service Locator
 
 Future<void> setupDependencies() async {
-  // AuthService
-  sl.registerLazySingleton<AuthService>(() => AuthService());
+  // --- CORE / HTTP ---
+  // Registamos o HttpClient primeiro porque o AuthService precisa dele
+  sl.registerLazySingleton<HttpClient>(() => HttpClient(baseUrl: 'http://10.0.2.2:8080'));
+
+  // --- SERVIÇOS ---
+  // Agora injetamos o HttpClient no AuthService real
+  sl.registerLazySingleton<AuthService>(() => AuthService(sl<HttpClient>()));
 
   // Database - aguardar inicialização
   final db = await DatabaseHelper.instance.db;
 
-  // Repositórios
+  // --- REPOSITÓRIOS ---
   sl.registerLazySingleton<SqfliteClienteRepository>(
     () => SqfliteClienteRepository(db),
   );
@@ -50,7 +59,7 @@ Future<void> setupDependencies() async {
     () => SqfliteAvaliacaoRepository(db),
   );
 
-  // Notifiers
+  // --- NOTIFIERS ---
   sl.registerLazySingleton<ClienteNotifier>(
     () => ClienteNotifier(sl<SqfliteClienteRepository>()),
   );

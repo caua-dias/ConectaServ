@@ -42,7 +42,11 @@ final class DatabaseHelper {
       id_empresa INTEGER PRIMARY KEY AUTOINCREMENT,
       cnpj TEXT NOT NULL UNIQUE,
       status_curadoria TEXT NOT NULL,
-      reputacao TEXT NOT NULL
+      reputacao TEXT NOT NULL,
+      nome_fantasia TEXT,
+      descricao TEXT,
+      localizacao TEXT,
+      emoji TEXT
     )
   ''';
 

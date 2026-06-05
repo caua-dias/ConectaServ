@@ -4,8 +4,11 @@ import 'package:provider/provider.dart';
 
 import 'router/app_router.dart';
 import 'core/di/injecao.dart';
+
+import 'data/services/auth_service.dart';
+// --------------------------------------
+
 import 'features/models/presentation/notifiers/auth_notifier.dart';
-import 'features/auth/auth_service.dart';
 import 'features/models/presentation/notifiers/cliente_notifier.dart';
 import 'features/models/presentation/notifiers/servico_notifier.dart';
 import 'features/models/presentation/notifiers/contratacao_notifier.dart';

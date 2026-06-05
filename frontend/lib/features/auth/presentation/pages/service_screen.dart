@@ -3,9 +3,11 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../models/presentation/notifiers/servico_notifier.dart';
+import '../../../../models/servico.dart';
 
 class ServiceScreen extends StatefulWidget {
-  const ServiceScreen({super.key});
+  final String id;
+  const ServiceScreen({super.key, required this.id});
 
   @override
   State<ServiceScreen> createState() => _ServiceScreenState();
@@ -13,6 +15,8 @@ class ServiceScreen extends StatefulWidget {
 
 class _ServiceScreenState extends State<ServiceScreen> {
   bool _visivel = false;
+  bool _carregando = true;
+  Servico? _servico;
 
   @override
   void initState() {
@@ -22,13 +26,28 @@ class _ServiceScreenState extends State<ServiceScreen> {
       if (mounted) setState(() => _visivel = true);
     });
     
-    // Carrega serviços
-    Future.microtask(
-      () => context.read<ServicoNotifier>().buscarTodos(),
-    );
+    _carregarDados();
   }
 
-  /// Widget helper para fade-in escalonado, exatamente como na LoginPage
+  Future<void> _carregarDados() async {
+    try {
+      final idParsed = int.tryParse(widget.id);
+      if (idParsed != null) {
+        final servicoEncontrado = await context.read<ServicoNotifier>().buscarPorId(idParsed);
+        if (mounted) {
+          setState(() {
+            _servico = servicoEncontrado;
+            _carregando = false;
+          });
+        }
+      } else {
+        if (mounted) setState(() => _carregando = false);
+      }
+    } catch (e) {
+      if (mounted) setState(() => _carregando = false);
+    }
+  }
+
   Widget _fadeIn({required Widget child, required int ordem}) {
     return AnimatedOpacity(
       opacity: _visivel ? 1.0 : 0.0,
@@ -43,21 +62,50 @@ class _ServiceScreenState extends State<ServiceScreen> {
     );
   }
 
+  // Função auxiliar para capitalizar o nome da categoria
+  String _formatarCategoria(String categoria) {
+    if (categoria.isEmpty) return '';
+    return categoria[0].toUpperCase() + categoria.substring(1).toLowerCase();
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_carregando) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_servico == null) {
+      return Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => context.pop(),
+          ),
+        ),
+        body: const Center(
+          child: Text('Serviço não encontrado.', style: TextStyle(color: Colors.grey)),
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
-          'Serviços',
+          'Detalhes do Serviço',
           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
         ),
         centerTitle: true,
-        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => context.pop(),
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -69,17 +117,17 @@ class _ServiceScreenState extends State<ServiceScreen> {
                 _fadeIn(
                   ordem: 1,
                   child: Text(
-                    'Gestão de marketing digital',
+                    _formatarCategoria(_servico!.categoria.name),
                     textAlign: TextAlign.center,
                     style: Theme.of(context)
                         .textTheme
                         .headlineSmall
-                        ?.copyWith(fontWeight: FontWeight.bold),
+                        ?.copyWith(fontWeight: FontWeight.bold, color: Colors.blueAccent),
                   ),
                 ),
                 const SizedBox(height: 32),
 
-                // Imagem com Scale igual ao logo do Login
+                // Imagem (Mantida a original como placeholder visual)
                 AnimatedScale(
                   scale: _visivel ? 1.0 : 0.6,
                   duration: const Duration(milliseconds: 600),
@@ -105,6 +153,7 @@ class _ServiceScreenState extends State<ServiceScreen> {
                         child: Image.network(
                           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOHNDctaIc4YYGBgh55wsNSkZogf9RYmaVkA&s',
                           fit: BoxFit.cover,
+                          width: double.infinity,
                         ),
                       ),
                     ),
@@ -125,16 +174,16 @@ class _ServiceScreenState extends State<ServiceScreen> {
                 _fadeIn(
                   ordem: 3,
                   child: Container(
-                    height: 140, // Aumentado um pouco para caber melhor o texto
+                    height: 140, 
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey.shade300), // Estética alinhada aos TextFields
+                      border: Border.all(color: Colors.grey.shade300),
                       color: Colors.grey.shade50,
                     ),
                     padding: const EdgeInsets.all(16),
                     child: SingleChildScrollView(
                       child: Text(
-                        'Somos uma empresa especializada em gestão de marketing digital, oferecendo soluções personalizadas para impulsionar a presença online de nossos clientes. Com uma equipe experiente e dedicada, trabalhamos para criar estratégias eficazes que aumentam a visibilidade, engajamento e conversões. Nossos serviços incluem gerenciamento de redes sociais, criação de conteúdo, campanhas publicitárias e análise de desempenho, tudo com o objetivo de ajudar nossos clientes a alcançar seus objetivos de negócios.',
+                        _servico!.descricao, // Dados REAIS do banco
                         textAlign: TextAlign.justify,
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
@@ -164,7 +213,7 @@ class _ServiceScreenState extends State<ServiceScreen> {
                     ),
                     alignment: Alignment.center,
                     child: Text(
-                      'R\$ 150,00',
+                      'R\$ ${_servico!.preco.toStringAsFixed(2).replaceAll('.', ',')}', // Dados REAIS do banco
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             color: Colors.green.shade700,
                             fontWeight: FontWeight.bold,
@@ -177,9 +226,12 @@ class _ServiceScreenState extends State<ServiceScreen> {
                 _fadeIn(
                   ordem: 6,
                   child: ElevatedButton(
-                    onPressed: () {}, 
+                    onPressed: () {
+                      // Opcional: Navegar para o perfil da empresa que fornece o serviço
+                      context.push('/empresa/${_servico!.idEmpresa}');
+                    }, 
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green, // Mantido verde vibrante como pedido
+                      backgroundColor: Colors.green, 
                       foregroundColor: Colors.white, 
                       elevation: 0,
                       shape: RoundedRectangleBorder(
@@ -188,7 +240,7 @@ class _ServiceScreenState extends State<ServiceScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
                     child: const Text(
-                      'Comprar',
+                      'Ver Empresa Fornecedora',
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -200,16 +252,16 @@ class _ServiceScreenState extends State<ServiceScreen> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0, // Home selecionada por padrão
+        currentIndex: 1, // Fixado como index 1 (Serviços/Busca) já que viemos de lá
         selectedItemColor: Theme.of(context).primaryColor,
         unselectedItemColor: Colors.grey,
         onTap: (index) {
           if (index == 0) {
-            context.go('/home'); // Vai para a própria landing page
+            context.go('/home');
           } else if (index == 1) {
-            context.go('/raiting'); // rota para a pagina de avaliação
+            context.go('/busca');
           } else if (index == 2) {
-            print('Ir para Perfil (Rota não criada)');
+            context.go('/configuracoes');
           }
         },
         items: const [
@@ -218,12 +270,12 @@ class _ServiceScreenState extends State<ServiceScreen> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.star_outline), // Ícone alterado conforme pedido
-            label: 'Avaliações',
+            icon: Icon(Icons.search),
+            label: 'Buscar',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            label: 'Conta',
+            icon: Icon(Icons.settings_outlined),
+            label: 'Config.',
           ),
         ],
       ),

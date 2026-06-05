@@ -12,37 +12,31 @@ class RecoverPasswordPage extends StatefulWidget {
 }
 
 class _RecoverPasswordPageState extends State<RecoverPasswordPage> {
-  // 1. Chave para coordenar a validação
   final _formKey = GlobalKey<FormState>();
   final TextEditingController emailController = TextEditingController();
-  
-  // 2. FocusNode para gerenciar o teclado
   final FocusNode _emailFocus = FocusNode();
   
-  // 3. Estado de carregamento
   bool _carregando = false;
 
   @override
   void dispose() {
-    // 4. Liberar os recursos de memória associados aos controllers e FocusNodes
     emailController.dispose();
     _emailFocus.dispose();
     super.dispose();
   }
 
-  // --- NOVO: Método para exibir o AlertDialog ---
   Future<bool> _confirmarEnvio(String email) async {
     final confirmado = await showDialog<bool>(
       context: context,
-      barrierDismissible: false, // Impede o fechamento tocando fora
+      barrierDismissible: false, 
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: const Text('Confirmar Email'),
+          title: const Text('Confirmar E-mail'),
           content: Text('Deseja enviar o código de recuperação para:\n\n$email'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(false),
-              child: const Text('Editar email'),
+              child: const Text('Editar e-mail'),
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(dialogContext).pop(true),
@@ -56,33 +50,27 @@ class _RecoverPasswordPageState extends State<RecoverPasswordPage> {
         );
       },
     );
-    return confirmado ?? false; // Retorna false se o dialog for fechado de outra forma
+    return confirmado ?? false; 
   }
 
   Future<void> _enviarCodigo() async {
-    // Valida o formulário antes de prosseguir
     if (!_formKey.currentState!.validate()) return;
 
-    // Remove o foco para esconder o teclado virtual
     FocusScope.of(context).unfocus();
 
     final email = emailController.text.trim();
 
-    // Aguarda a confirmação do usuário
     final confirmar = await _confirmarEnvio(email);
     
-    // Se o usuário não confirmou ou o widget não estiver mais na tela, interrompe
     if (!confirmar || !mounted) return;
 
-    // Ativa o LoadingOverlay
     setState(() => _carregando = true);
 
     try {
-      // Simula o tempo de rede (API)
-      await Future.delayed(const Duration(seconds: 2));
+      // Chamada REAL à API através do AuthNotifier
+      await context.read<AuthNotifier>().recoverPassword(email);
 
       if (mounted) {
-        // Feedback visual de sucesso
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
@@ -97,7 +85,7 @@ class _RecoverPasswordPageState extends State<RecoverPasswordPage> {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
         );
-        // Após o envio com sucesso, podemos retornar automaticamente para o login
+        // Após o envio com sucesso, retornamos ao login
         Navigator.pop(context);
       }
     } catch (e) {
@@ -108,7 +96,7 @@ class _RecoverPasswordPageState extends State<RecoverPasswordPage> {
               children: [
                 const Icon(Icons.error_outline, color: Colors.white),
                 const SizedBox(width: 12),
-                Expanded(child: Text('Erro ao enviar o código. Tente novamente.')),
+                const Expanded(child: Text('Erro ao enviar o código. Tente novamente.')),
               ],
             ),
             backgroundColor: Colors.red.shade700,
@@ -118,14 +106,12 @@ class _RecoverPasswordPageState extends State<RecoverPasswordPage> {
         );
       }
     } finally {
-      // Desativa o overlay independente do resultado
       if (mounted) setState(() => _carregando = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // --- NOVO: LoadingOverlay envolve a tela ---
     return LoadingOverlay(
       isLoading: _carregando,
       color: Colors.black.withOpacity(0.5),
@@ -145,7 +131,7 @@ class _RecoverPasswordPageState extends State<RecoverPasswordPage> {
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(32),
-                    child: Form( // --- NOVO: O widget Form envolve a coluna ---
+                    child: Form(
                       key: _formKey,
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       child: Column(
@@ -158,7 +144,7 @@ class _RecoverPasswordPageState extends State<RecoverPasswordPage> {
                           ),
                           const SizedBox(height: 24),
                           const Text(
-                            'Recuperar senha',
+                            'Recuperar palavra-passe',
                             style: TextStyle(
                               fontSize: 26,
                               fontWeight: FontWeight.bold,
@@ -166,33 +152,31 @@ class _RecoverPasswordPageState extends State<RecoverPasswordPage> {
                           ),
                           const SizedBox(height: 8),
                           const Text(
-                            'Digite seu email para receber o código de recuperação.',
+                            'Digite o seu e-mail para receber o código de recuperação.',
                             textAlign: TextAlign.center,
                             style: TextStyle(color: Colors.black54),
                           ),
                           const SizedBox(height: 32),
-                          // --- NOVO: Trocado TextField por TextFormField ---
                           TextFormField(
                             controller: emailController,
-                            focusNode: _emailFocus, // Gerencia o foco
+                            focusNode: _emailFocus, 
                             keyboardType: TextInputType.emailAddress,
                             textInputAction: TextInputAction.done,
-                            onFieldSubmitted: (_) => _enviarCodigo(), // Aciona o envio pelo teclado
+                            onFieldSubmitted: (_) => _enviarCodigo(), 
                             decoration: InputDecoration(
-                              labelText: 'Email',
+                              labelText: 'E-mail',
                               prefixIcon: const Icon(Icons.email_outlined),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                            // Validador nativo
                             validator: (valor) {
                               if (valor == null || valor.trim().isEmpty) {
-                                return 'O email é obrigatório';
+                                return 'O e-mail é obrigatório';
                               }
                               final regexEmail = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
                               if (!regexEmail.hasMatch(valor.trim())) {
-                                return 'Informe um e-mail válido (ex: usuario@email.com)';
+                                return 'Informe um e-mail válido (ex: utilizador@email.com)';
                               }
                               return null;
                             },
@@ -221,7 +205,7 @@ class _RecoverPasswordPageState extends State<RecoverPasswordPage> {
                             onPressed: () {
                               Navigator.pop(context);
                             },
-                            child: const Text('Lembrei! Voltar para login'),
+                            child: const Text('Lembrei! Voltar para o login'),
                           ),
                         ],
                       ),
