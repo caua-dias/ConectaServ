@@ -53,6 +53,9 @@ class AppShell extends StatelessWidget {
               case 3:
                 context.go('/configuracoes');
                 break;
+              case 4:
+                context.go('/novo_servico');
+                break;
             }
           },
           items: const [
@@ -75,6 +78,11 @@ class AppShell extends StatelessWidget {
               icon: Icon(Icons.settings_outlined),
               activeIcon: Icon(Icons.settings),
               label: 'Config.',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.add_outlined),
+              activeIcon: Icon(Icons.add),
+              label: 'Novo Serviço',
             ),
           ],
         ),

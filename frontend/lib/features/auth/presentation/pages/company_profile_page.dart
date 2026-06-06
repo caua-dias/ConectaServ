@@ -8,7 +8,6 @@ import '../../../models/presentation/notifiers/servico_notifier.dart';
 import '../../../models/presentation/notifiers/contratacao_notifier.dart';
 import '../../../../models/empresa_prestadora.dart';
 import '../../../../models/servico.dart';
-import '../../../../models/avaliacao.dart';
 import '../../../../models/contratacao.dart';
 import '../../../../models/enums.dart';
 
@@ -53,8 +52,9 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>
       if (idEmpresa == null) throw Exception('ID inválido');
 
       // Carrega empresa
-      final empresa =
-          await context.read<EmpresaPrestadoraNotifier>().buscarPorId(idEmpresa);
+      final empresa = await context
+          .read<EmpresaPrestadoraNotifier>()
+          .buscarPorId(idEmpresa);
       // Carrega serviços da empresa
       await context.read<ServicoNotifier>().buscarPorEmpresa(idEmpresa);
 
@@ -313,8 +313,7 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>
                     ),
                     child: SafeArea(
                       child: Padding(
-                        padding:
-                            const EdgeInsets.fromLTRB(20, 56, 20, 16),
+                        padding: const EdgeInsets.fromLTRB(20, 56, 20, 16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -351,14 +350,12 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>
                                         padding: const EdgeInsets.symmetric(
                                             horizontal: 8, vertical: 2),
                                         decoration: BoxDecoration(
-                                          color:
-                                              Colors.white.withOpacity(0.2),
+                                          color: Colors.white.withOpacity(0.2),
                                           borderRadius:
                                               BorderRadius.circular(4),
                                         ),
                                         child: Text(
-                                          _statusLabel(
-                                              empresa.statusCuradoria),
+                                          _statusLabel(empresa.statusCuradoria),
                                           style: TextStyle(
                                             color: _statusColor(
                                                 empresa.statusCuradoria),
@@ -370,8 +367,7 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>
                                       const SizedBox(height: 4),
                                       Row(children: [
                                         const Icon(Icons.star,
-                                            color: Color(0xFFFBBF24),
-                                            size: 14),
+                                            color: Color(0xFFFBBF24), size: 14),
                                         const SizedBox(width: 2),
                                         Text(
                                           mediaAvaliacoes > 0
@@ -400,14 +396,13 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>
                               Expanded(
                                 child: ElevatedButton.icon(
                                   onPressed: () {},
-                                  icon: const Icon(Icons.mail_outline,
-                                      size: 16),
+                                  icon:
+                                      const Icon(Icons.mail_outline, size: 16),
                                   label: const Text('Contato',
                                       style: TextStyle(fontSize: 13)),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.white,
-                                    foregroundColor:
-                                        const Color(0xFF2563EB),
+                                    foregroundColor: const Color(0xFF2563EB),
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 10),
                                     elevation: 0,
@@ -422,11 +417,10 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>
                                       size: 16, color: Colors.white),
                                   label: const Text('Ligar',
                                       style: TextStyle(
-                                          fontSize: 13,
-                                          color: Colors.white)),
+                                          fontSize: 13, color: Colors.white)),
                                   style: OutlinedButton.styleFrom(
-                                    side: const BorderSide(
-                                        color: Colors.white54),
+                                    side:
+                                        const BorderSide(color: Colors.white54),
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 10),
                                   ),
@@ -452,9 +446,7 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>
                       labelStyle: const TextStyle(
                           fontWeight: FontWeight.w600, fontSize: 13),
                       tabs: [
-                        Tab(
-                            text:
-                                'Serviços (${servicos.length})'),
+                        Tab(text: 'Serviços (${servicos.length})'),
                         const Tab(text: 'Sobre'),
                         Tab(text: 'Avaliações (${avaliacoes.length})'),
                       ],
@@ -470,8 +462,7 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>
                 servicoNotifier.carregando
                     ? const Center(child: CircularProgressIndicator())
                     : servicos.isEmpty
-                        ? _emptyState(
-                            'Nenhum serviço cadastrado',
+                        ? _emptyState('Nenhum serviço cadastrado',
                             Icons.build_circle_outlined)
                         : ListView.separated(
                             padding: const EdgeInsets.all(16),
@@ -488,8 +479,7 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>
                                       color: const Color(0xFFE2E8F0)),
                                   boxShadow: [
                                     BoxShadow(
-                                        color:
-                                            Colors.black.withOpacity(0.04),
+                                        color: Colors.black.withOpacity(0.04),
                                         blurRadius: 8,
                                         offset: const Offset(0, 2)),
                                   ],
@@ -510,13 +500,10 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>
                                             decoration: BoxDecoration(
                                               color: _tipoBg(s.categoria),
                                               borderRadius:
-                                                  BorderRadius.circular(
-                                                      10),
+                                                  BorderRadius.circular(10),
                                             ),
-                                            child: Icon(
-                                                Icons.build_outlined,
-                                                color: _tipoColor(
-                                                    s.categoria),
+                                            child: Icon(Icons.build_outlined,
+                                                color: _tipoColor(s.categoria),
                                                 size: 22),
                                           ),
                                           const SizedBox(width: 12),
@@ -531,8 +518,7 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>
                                                       fontWeight:
                                                           FontWeight.bold,
                                                       fontSize: 15,
-                                                      color: Color(
-                                                          0xFF0F172A)),
+                                                      color: Color(0xFF0F172A)),
                                                 ),
                                                 const SizedBox(height: 4),
                                                 Container(
@@ -541,8 +527,7 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>
                                                       horizontal: 7,
                                                       vertical: 2),
                                                   decoration: BoxDecoration(
-                                                    color:
-                                                        _tipoBg(s.categoria),
+                                                    color: _tipoBg(s.categoria),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             4),
@@ -579,22 +564,18 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>
                                           icon: const Icon(
                                               Icons.handshake_outlined,
                                               size: 16),
-                                          label: const Text(
-                                              'Contratar Serviço',
+                                          label: const Text('Contratar Serviço',
                                               style: TextStyle(
-                                                  fontWeight:
-                                                      FontWeight.w600)),
+                                                  fontWeight: FontWeight.w600)),
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor:
                                                 const Color(0xFF2563EB),
                                             foregroundColor: Colors.white,
-                                            padding:
-                                                const EdgeInsets.symmetric(
-                                                    vertical: 12),
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 12),
                                             shape: RoundedRectangleBorder(
                                                 borderRadius:
-                                                    BorderRadius.circular(
-                                                        8)),
+                                                    BorderRadius.circular(8)),
                                           ),
                                         ),
                                       ),
@@ -611,12 +592,11 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>
                   child: Column(
                     children: [
                       _infoCard('Informações da Empresa', [
-                        _infoRow(Icons.badge_outlined, 'CNPJ',
-                            empresa.cnpj),
+                        _infoRow(Icons.badge_outlined, 'CNPJ', empresa.cnpj),
                         _infoRow(Icons.verified_outlined, 'Status de Curadoria',
                             _statusLabel(empresa.statusCuradoria)),
-                        _infoRow(Icons.star_outline, 'Reputação',
-                            empresa.reputacao),
+                        _infoRow(
+                            Icons.star_outline, 'Reputação', empresa.reputacao),
                       ]),
                       const SizedBox(height: 12),
                       _infoCard('Serviços disponíveis', [
@@ -635,8 +615,7 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>
                                           horizontal: 10, vertical: 5),
                                       decoration: BoxDecoration(
                                         color: _tipoBg(cat),
-                                        borderRadius:
-                                            BorderRadius.circular(6),
+                                        borderRadius: BorderRadius.circular(6),
                                         border: Border.all(
                                             color: _tipoColor(cat)
                                                 .withOpacity(0.4)),
@@ -680,8 +659,7 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>
                                       Column(
                                         children: [
                                           Text(
-                                            mediaAvaliacoes
-                                                .toStringAsFixed(1),
+                                            mediaAvaliacoes.toStringAsFixed(1),
                                             style: const TextStyle(
                                                 fontSize: 40,
                                                 fontWeight: FontWeight.bold,
@@ -715,28 +693,26 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>
                                         child: Column(
                                           children: [5, 4, 3, 2, 1].map((s) {
                                             final count = avaliacoes
-                                                .where((a) =>
-                                                    a.estrelas == s)
+                                                .where((a) => a.estrelas == s)
                                                 .length;
                                             final pct = avaliacoes.isEmpty
                                                 ? 0.0
-                                                : count /
-                                                    avaliacoes.length;
+                                                : count / avaliacoes.length;
                                             return Padding(
                                               padding:
                                                   const EdgeInsets.symmetric(
                                                       vertical: 2),
                                               child: Row(children: [
                                                 Icon(Icons.star,
-                                                    color: const Color(
-                                                        0xFFF59E0B),
+                                                    color:
+                                                        const Color(0xFFF59E0B),
                                                     size: 12),
                                                 const SizedBox(width: 4),
                                                 Text('$s',
                                                     style: const TextStyle(
                                                         fontSize: 11,
-                                                        color: Color(
-                                                            0xFF64748B))),
+                                                        color:
+                                                            Color(0xFF64748B))),
                                                 const SizedBox(width: 6),
                                                 Expanded(
                                                   child: ClipRRect(
@@ -771,21 +747,17 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>
 
                             // Lista de avaliações
                             if (avaliacoes.isEmpty)
-                              _emptyState(
-                                  'Nenhuma avaliação ainda',
+                              _emptyState('Nenhuma avaliação ainda',
                                   Icons.rate_review_outlined)
                             else
                               ...avaliacoes.map((av) => Padding(
-                                    padding:
-                                        const EdgeInsets.only(bottom: 12),
+                                    padding: const EdgeInsets.only(bottom: 12),
                                     child: Container(
                                       decoration: BoxDecoration(
                                         color: Colors.white,
-                                        borderRadius:
-                                            BorderRadius.circular(12),
+                                        borderRadius: BorderRadius.circular(12),
                                         border: Border.all(
-                                            color:
-                                                const Color(0xFFE2E8F0)),
+                                            color: const Color(0xFFE2E8F0)),
                                       ),
                                       child: Padding(
                                         padding: const EdgeInsets.all(14),
@@ -801,8 +773,7 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>
                                                 child: Text(
                                                   'C${av.idContratacao}',
                                                   style: const TextStyle(
-                                                      color:
-                                                          Color(0xFF2563EB),
+                                                      color: Color(0xFF2563EB),
                                                       fontWeight:
                                                           FontWeight.bold,
                                                       fontSize: 11),
@@ -812,8 +783,7 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>
                                               Expanded(
                                                 child: Column(
                                                   crossAxisAlignment:
-                                                      CrossAxisAlignment
-                                                          .start,
+                                                      CrossAxisAlignment.start,
                                                   children: [
                                                     Text(
                                                       'Contratação #${av.idContratacao}',
@@ -825,8 +795,8 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>
                                                     Text(
                                                       'Avaliação #${av.idAvaliacao ?? '—'}',
                                                       style: const TextStyle(
-                                                          color: Color(
-                                                              0xFF64748B),
+                                                          color:
+                                                              Color(0xFF64748B),
                                                           fontSize: 11),
                                                     ),
                                                   ],
@@ -841,8 +811,8 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>
                                                       av.estrelas,
                                                       (_) => const Icon(
                                                           Icons.star,
-                                                          color: Color(
-                                                              0xFFF59E0B),
+                                                          color:
+                                                              Color(0xFFF59E0B),
                                                           size: 13),
                                                     ),
                                                   ),
@@ -850,8 +820,7 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>
                                               ),
                                             ]),
                                             if (av.comentarios != null &&
-                                                av.comentarios!
-                                                    .isNotEmpty) ...[
+                                                av.comentarios!.isNotEmpty) ...[
                                               const SizedBox(height: 8),
                                               Text(
                                                 av.comentarios!,
@@ -914,8 +883,8 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label,
-                  style: const TextStyle(
-                      fontSize: 11, color: Color(0xFF94A3B8))),
+                  style:
+                      const TextStyle(fontSize: 11, color: Color(0xFF94A3B8))),
               Text(value,
                   style: const TextStyle(
                       fontSize: 13,
@@ -937,8 +906,7 @@ class _CompanyProfilePageState extends State<CompanyProfilePage>
             Icon(icon, size: 56, color: Colors.grey[300]),
             const SizedBox(height: 12),
             Text(msg,
-                style: const TextStyle(
-                    color: Color(0xFF64748B), fontSize: 15)),
+                style: const TextStyle(color: Color(0xFF64748B), fontSize: 15)),
           ],
         ),
       ),

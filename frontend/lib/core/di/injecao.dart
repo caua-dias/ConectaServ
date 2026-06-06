@@ -1,10 +1,4 @@
 import 'package:get_it/get_it.dart';
-import 'package:sqflite/sqflite.dart';
-
-// --- NOVAS IMPORTAÇÕES PARA A AUTENTICAÇÃO REAL ---
-import '../../core/http_client.dart';
-import '../../data/services/auth_service.dart';
-// --------------------------------------------------
 
 import '../../features/models/presentation/notifiers/cliente_notifier.dart';
 import '../../features/models/presentation/notifiers/servico_notifier.dart';
@@ -20,67 +14,37 @@ import '../../infrastructure/repositories/sqflite_projeto_portfolio_repository.d
 import '../../infrastructure/repositories/sqflite_servico_repository.dart';
 import '../../infrastructure/repositories/sqflite_avaliacao_repository.dart';
 
-final sl = GetIt.instance; // sl = Service Locator
+final sl = GetIt.instance;
 
 Future<void> setupDependencies() async {
-  // --- CORE / HTTP ---
-  // Registamos o HttpClient primeiro porque o AuthService precisa dele
-  sl.registerLazySingleton<HttpClient>(() => HttpClient(baseUrl: 'http://10.0.2.2:8080'));
-
-  // --- SERVIÇOS ---
-  // Agora injetamos o HttpClient no AuthService real
-  sl.registerLazySingleton<AuthService>(() => AuthService(sl<HttpClient>()));
-
   // Database - aguardar inicialização
   final db = await DatabaseHelper.instance.db;
 
-  // --- REPOSITÓRIOS ---
+  // --- REPOSITÓRIOS DO SQLITE ---
   sl.registerLazySingleton<SqfliteClienteRepository>(
-    () => SqfliteClienteRepository(db),
-  );
-  
+      () => SqfliteClienteRepository(db));
   sl.registerLazySingleton<SqfliteContratacaoRepository>(
-    () => SqfliteContratacaoRepository(db),
-  );
-  
+      () => SqfliteContratacaoRepository(db));
   sl.registerLazySingleton<SqfliteEmpresaPrestadoraRepository>(
-    () => SqfliteEmpresaPrestadoraRepository(db),
-  );
-  
+      () => SqfliteEmpresaPrestadoraRepository(db));
   sl.registerLazySingleton<SqfliteProjetoPortfolioRepository>(
-    () => SqfliteProjetoPortfolioRepository(db),
-  );
-  
+      () => SqfliteProjetoPortfolioRepository(db));
   sl.registerLazySingleton<SqfliteServicoRepository>(
-    () => SqfliteServicoRepository(db),
-  );
-
+      () => SqfliteServicoRepository(db));
   sl.registerLazySingleton<SqfliteAvaliacaoRepository>(
-    () => SqfliteAvaliacaoRepository(db),
-  );
+      () => SqfliteAvaliacaoRepository(db));
 
   // --- NOTIFIERS ---
   sl.registerLazySingleton<ClienteNotifier>(
-    () => ClienteNotifier(sl<SqfliteClienteRepository>()),
-  );
-
+      () => ClienteNotifier(sl<SqfliteClienteRepository>()));
   sl.registerLazySingleton<ServicoNotifier>(
-    () => ServicoNotifier(sl<SqfliteServicoRepository>()),
-  );
-
+      () => ServicoNotifier(sl<SqfliteServicoRepository>()));
   sl.registerLazySingleton<ContratacaoNotifier>(
-    () => ContratacaoNotifier(sl<SqfliteContratacaoRepository>()),
-  );
-
-  sl.registerLazySingleton<EmpresaPrestadoraNotifier>(
-    () => EmpresaPrestadoraNotifier(sl<SqfliteEmpresaPrestadoraRepository>()),
-  );
-
+      () => ContratacaoNotifier(sl<SqfliteContratacaoRepository>()));
+  sl.registerLazySingleton<EmpresaPrestadoraNotifier>(() =>
+      EmpresaPrestadoraNotifier(sl<SqfliteEmpresaPrestadoraRepository>()));
   sl.registerLazySingleton<ProjetoPortfolioNotifier>(
-    () => ProjetoPortfolioNotifier(sl<SqfliteProjetoPortfolioRepository>()),
-  );
-
+      () => ProjetoPortfolioNotifier(sl<SqfliteProjetoPortfolioRepository>()));
   sl.registerLazySingleton<AvaliacaoNotifier>(
-    () => AvaliacaoNotifier(sl<SqfliteAvaliacaoRepository>()),
-  );
+      () => AvaliacaoNotifier(sl<SqfliteAvaliacaoRepository>()));
 }

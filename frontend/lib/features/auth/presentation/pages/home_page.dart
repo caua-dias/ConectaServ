@@ -20,12 +20,12 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    
+
     // Dispara a animação de fade-in gradual
     Future.delayed(const Duration(milliseconds: 100), () {
       if (mounted) setState(() => _visivel = true);
     });
-    
+
     // Carrega os serviços reais do banco SQLite
     Future.microtask(
       () => context.read<ServicoNotifier>().buscarTodos(),
@@ -37,7 +37,8 @@ class _HomePageState extends State<HomePage> {
     final int actualCount = Categoria.values.length;
     final int middleIndex = virtualCount ~/ 2;
     final int initialIndex = middleIndex - (middleIndex % actualCount);
-    const double estimatedChipWidth = 130.0; // Largura média estimada de cada Chip
+    const double estimatedChipWidth =
+        130.0; // Largura média estimada de cada Chip
 
     _categoryScrollController = ScrollController(
       initialScrollOffset: initialIndex * estimatedChipWidth,
@@ -122,34 +123,6 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          border: Border(top: BorderSide(color: Colors.grey[200]!)),
-        ),
-        child: BottomNavigationBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          selectedItemColor: Colors.blueAccent,
-          unselectedItemColor: Colors.grey,
-          showSelectedLabels: true,
-          showUnselectedLabels: true,
-          currentIndex: 0, 
-          onTap: (index) {
-            if (index == 0) {
-              context.go('/home'); 
-            } else if (index == 1) {
-              context.go('/busca'); 
-            } else if (index == 2) {
-              context.go('/configuracoes');
-            }
-          },
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-            BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Buscar'),
-            BottomNavigationBarItem(icon: Icon(Icons.settings_outlined), label: 'Config.'),
-          ],
-        ),
-      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -157,7 +130,7 @@ class _HomePageState extends State<HomePage> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: _fadeIn(
-                ordem: 1, 
+                ordem: 1,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -174,7 +147,8 @@ class _HomePageState extends State<HomePage> {
                     Text(
                       'ConectaServ',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold, color: Colors.blueAccent),
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blueAccent),
                     ),
                     IconButton(
                       icon: const Icon(Icons.notifications_none_outlined),
@@ -198,7 +172,8 @@ class _HomePageState extends State<HomePage> {
                           _fadeIn(
                             ordem: 2,
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 24.0),
                               child: GestureDetector(
                                 onTap: () => context.go('/busca'),
                                 child: Container(
@@ -206,7 +181,8 @@ class _HomePageState extends State<HomePage> {
                                   decoration: BoxDecoration(
                                     color: Colors.grey[100],
                                     borderRadius: BorderRadius.circular(25),
-                                    border: Border.all(color: Colors.grey[300]!),
+                                    border:
+                                        Border.all(color: Colors.grey[300]!),
                                   ),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -236,18 +212,23 @@ class _HomePageState extends State<HomePage> {
                                 itemCount: 10000,
                                 itemBuilder: (ctx, index) {
                                   final categorias = Categoria.values;
-                                  final cat = categorias[index % categorias.length];
+                                  final cat =
+                                      categorias[index % categorias.length];
                                   final label = _categoriaLabel(cat);
-                                  
+
                                   return Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 5.0),
                                     child: GestureDetector(
-                                      onTap: () => context.go('/busca?categoria=${cat.name}'),
+                                      onTap: () => context
+                                          .go('/busca?categoria=${cat.name}'),
                                       child: Chip(
                                         backgroundColor: Colors.white,
                                         label: Text(label),
-                                        side: BorderSide(color: Colors.grey[300]!),
-                                        labelStyle: const TextStyle(color: Colors.black87),
+                                        side: BorderSide(
+                                            color: Colors.grey[300]!),
+                                        labelStyle: const TextStyle(
+                                            color: Colors.black87),
                                       ),
                                     ),
                                   );
@@ -280,7 +261,7 @@ class _HomePageState extends State<HomePage> {
                           const SizedBox(height: 16),
                           _buildServiceCarousel(realServices.reversed.toList()),
 
-                          const SizedBox(height: 40), 
+                          const SizedBox(height: 40),
                         ],
                       ),
                     ),
@@ -307,12 +288,14 @@ class _HomePageState extends State<HomePage> {
     final int actualCount = services.length;
     const int virtualCount = 10000;
     // Centraliza o PageView para permitir rolagem infinita imediata para a esquerda ou direita
-    final int initialPage = (virtualCount ~/ 2) - ((virtualCount ~/ 2) % actualCount);
+    final int initialPage =
+        (virtualCount ~/ 2) - ((virtualCount ~/ 2) % actualCount);
 
     return SizedBox(
       height: 180,
       child: PageView.builder(
-        controller: PageController(viewportFraction: 0.85, initialPage: initialPage),
+        controller:
+            PageController(viewportFraction: 0.85, initialPage: initialPage),
         itemCount: virtualCount,
         itemBuilder: (ctx, index) {
           final servico = services[index % actualCount];
@@ -352,14 +335,18 @@ class _HomePageState extends State<HomePage> {
                           child: Icon(icon, size: 24, color: color),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
                             color: color.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
                             labelCategoria,
-                            style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                                color: color,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],
@@ -367,7 +354,8 @@ class _HomePageState extends State<HomePage> {
                     const Spacer(),
                     Text(
                       servico.descricao,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 15),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -377,12 +365,19 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         Text(
                           'R\$ ${servico.preco.toStringAsFixed(2).replaceAll('.', ',')}',
-                          style: TextStyle(color: Colors.green.shade700, fontWeight: FontWeight.bold, fontSize: 15),
+                          style: TextStyle(
+                              color: Colors.green.shade700,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15),
                         ),
                         TextButton(
-                          onPressed: () => context.push('/service/${servico.idServico}'),
-                          style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: Size.zero),
-                          child: const Text('ver detalhes', style: TextStyle(color: Colors.blueAccent, fontSize: 12)),
+                          onPressed: () =>
+                              context.push('/service/${servico.idServico}'),
+                          style: TextButton.styleFrom(
+                              padding: EdgeInsets.zero, minimumSize: Size.zero),
+                          child: const Text('ver detalhes',
+                              style: TextStyle(
+                                  color: Colors.blueAccent, fontSize: 12)),
                         ),
                       ],
                     ),

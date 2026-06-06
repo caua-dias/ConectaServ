@@ -6,6 +6,8 @@ import '../../../models/presentation/notifiers/cliente_notifier.dart';
 import '../../../../models/cliente.dart';
 import '../../../../models/enums.dart';
 
+import '../../../models/presentation/notifiers/auth_notifier.dart';
+
 class RegisterClientScreen extends StatefulWidget {
   const RegisterClientScreen({super.key});
 
@@ -15,7 +17,7 @@ class RegisterClientScreen extends StatefulWidget {
 
 class _RegisterClientScreenState extends State<RegisterClientScreen> {
   final _formKey = GlobalKey<FormState>();
-  
+
   bool _senhaVisivel = true;
   bool _visivel = false;
   bool _isLoading = false;
@@ -41,7 +43,6 @@ class _RegisterClientScreenState extends State<RegisterClientScreen> {
   }
 
   void _showSnackBar(String mensagem, {bool isError = false}) {
-    // Limpa snacks anteriores para evitar fila e atraso no feedback
     ScaffoldMessenger.of(context).removeCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -59,12 +60,12 @@ class _RegisterClientScreenState extends State<RegisterClientScreen> {
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         title: const Text('Sucesso!'),
-        content: const Text('Sua conta foi criada com êxito.'),
+        content: const Text('A sua conta foi criada com êxito.'),
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context); // Fecha o dialog
-              if (mounted) context.pop(); // Retorna à tela anterior
+              Navigator.pop(context);
+              if (mounted) context.pop();
             },
             child: const Text('OK'),
           ),
@@ -78,11 +79,18 @@ class _RegisterClientScreenState extends State<RegisterClientScreen> {
       setState(() => _isLoading = true);
 
       try {
+        // 1. Regista o cliente na API Real
+        await context.read<AuthNotifier>().registerClient(
+              documento: _cpfCnpjController.text,
+              email: _emailController.text,
+              senha: _senhaController.text,
+            );
+
+        // 2. Salva no SQLite
         final cliente = Cliente(
           tipo: TipoCliente.pessoaFisica,
           cpfCnpj: _cpfCnpjController.text,
         );
-
         await context.read<ClienteNotifier>().salvar(cliente);
 
         if (mounted) {
@@ -93,11 +101,12 @@ class _RegisterClientScreenState extends State<RegisterClientScreen> {
       } catch (e) {
         if (mounted) {
           setState(() => _isLoading = false);
-          _showSnackBar("Erro ao salvar cliente: $e", isError: true);
+          _showSnackBar("Erro ao salvar: $e", isError: true);
         }
       }
     } else {
-      _showSnackBar("Por favor, preencha os campos corretamente", isError: true);
+      _showSnackBar("Por favor, preencha os campos corretamente",
+          isError: true);
     }
   }
 
@@ -120,126 +129,214 @@ class _RegisterClientScreenState extends State<RegisterClientScreen> {
     return Stack(
       children: [
         Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.black),
-              onPressed: () => context.pop(),
+          backgroundColor: Colors.white,
+          // ── NAVBAR DA HOME ──────────────────────────────────────────────
+          bottomNavigationBar: Container(
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: Colors.grey[200]!)),
+            ),
+            child: BottomNavigationBar(
+              backgroundColor: Colors.white,
+              elevation: 0,
+              selectedItemColor: Colors
+                  .grey, // Mantemos cinza pois não estamos em nenhuma tab principal
+              unselectedItemColor: Colors.grey,
+              showSelectedLabels: true,
+              showUnselectedLabels: true,
+              currentIndex: 0,
+              onTap: (index) {
+                if (index == 0) {
+                  context.go('/home');
+                } else if (index == 1) {
+                  context.go('/busca');
+                } else if (index == 2) {
+                  context.go('/configuracoes');
+                }
+              },
+              items: const [
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.home_outlined), label: 'Home'),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.search), label: 'Buscar'),
+                BottomNavigationBarItem(
+                    icon: Icon(Icons.settings_outlined), label: 'Config.'),
+              ],
             ),
           ),
           body: SafeArea(
             child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      _fadeIn(
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // ── CABEÇALHO DA HOME (Com botão voltar acoplado) ────────
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: _fadeIn(
                         ordem: 1,
-                        child: Text(
-                          'Criar Conta - Cliente',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineSmall
-                              ?.copyWith(fontWeight: FontWeight.bold),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              children: [
+                                GestureDetector(
+                                  onTap: () => context.pop(),
+                                  child: const Icon(Icons.arrow_back,
+                                      color: Colors.black),
+                                ),
+                                const SizedBox(width: 8),
+                                const Icon(Icons.location_on_outlined,
+                                    color: Colors.grey),
+                                const SizedBox(width: 4),
+                                const Text(
+                                  'São Paulo - SP',
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              ],
+                            ),
+                            Text(
+                              'ConectaServ',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.blueAccent),
+                            ),
+                            IconButton(
+                              icon:
+                                  const Icon(Icons.notifications_none_outlined),
+                              onPressed: () {},
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      _fadeIn(
-                        ordem: 2,
-                        child: Text(
-                          'Preencha os dados para se cadastrar.',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ),
-                      const SizedBox(height: 32),
-                      _fadeIn(
-                        ordem: 3,
-                        child: TextFormField(
-                          controller: _cpfCnpjController,
-                          decoration: const InputDecoration(
-                            labelText: 'CPF ou CNPJ',
-                            prefixIcon: Icon(Icons.badge_outlined),
-                            border: OutlineInputBorder(),
-                            helperText: 'Apenas números (11 ou 14 dígitos)',
-                          ),
-                          keyboardType: TextInputType.number,
-                          // Nova validação de Documento
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'O documento é obrigatório';
-                            }
-                            // Remove pontos, traços ou espaços
-                            final cleanValue = value.replaceAll(RegExp(r'[^0-9]'), '');
-                            
-                            if (cleanValue.length != 11 && cleanValue.length != 14) {
-                              return 'Documento inválido. Use 11 (CPF) ou 14 (CNPJ) dígitos';
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      _fadeIn(
-                        ordem: 4,
-                        child: TextFormField(
-                          controller: _emailController,
-                          keyboardType: TextInputType.emailAddress,
-                          decoration: const InputDecoration(
-                            labelText: 'E-mail',
-                            prefixIcon: Icon(Icons.email_outlined),
-                            border: OutlineInputBorder(),
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'O e-mail é obrigatório';
-                            }
-                            if (!value.contains('@')) {
-                              return 'Insira um e-mail válido';
-                            }
-                            return null;
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      _fadeIn(
-                        ordem: 5,
-                        child: TextFormField(
-                          controller: _senhaController,
-                          obscureText: _senhaVisivel,
-                          decoration: InputDecoration(
-                            labelText: 'Senha',
-                            prefixIcon: const Icon(Icons.lock_outline),
-                            border: const OutlineInputBorder(),
-                            suffixIcon: IconButton(
-                              icon: Icon(_senhaVisivel ? Icons.visibility_off : Icons.visibility),
-                              onPressed: () => setState(() => _senhaVisivel = !_senhaVisivel),
+                    ),
+
+                    // ── CONTEÚDO DO FORMULÁRIO ───────────────────────────────
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _fadeIn(
+                            ordem: 2,
+                            child: Text(
+                              'Criar Conta - Cliente',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headlineSmall
+                                  ?.copyWith(fontWeight: FontWeight.bold),
                             ),
                           ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'A senha é obrigatória';
-                            }
-                            if (value.length < 8) {
-                              return 'A senha deve ter no mínimo 8 caracteres';
-                            }
-                            return null;
-                          },
-                        ),
+                          const SizedBox(height: 8),
+                          _fadeIn(
+                            ordem: 3,
+                            child: Text(
+                              'Preencha os dados para se cadastrar.',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+                          _fadeIn(
+                            ordem: 4,
+                            child: TextFormField(
+                              controller: _cpfCnpjController,
+                              decoration: const InputDecoration(
+                                labelText: 'CPF ou CNPJ',
+                                prefixIcon: Icon(Icons.badge_outlined),
+                                border: OutlineInputBorder(),
+                                helperText: 'Apenas números (11 ou 14 dígitos)',
+                              ),
+                              keyboardType: TextInputType.number,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'O documento é obrigatório';
+                                }
+                                final cleanValue =
+                                    value.replaceAll(RegExp(r'[^0-9]'), '');
+                                if (cleanValue.length != 11 &&
+                                    cleanValue.length != 14) {
+                                  return 'Documento inválido. Use 11 (CPF) ou 14 (CNPJ) dígitos';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          _fadeIn(
+                            ordem: 5,
+                            child: TextFormField(
+                              controller: _emailController,
+                              keyboardType: TextInputType.emailAddress,
+                              decoration: const InputDecoration(
+                                labelText: 'E-mail',
+                                prefixIcon: Icon(Icons.email_outlined),
+                                border: OutlineInputBorder(),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'O e-mail é obrigatório';
+                                }
+                                if (!value.contains('@')) {
+                                  return 'Insira um e-mail válido';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          _fadeIn(
+                            ordem: 6,
+                            child: TextFormField(
+                              controller: _senhaController,
+                              obscureText: _senhaVisivel,
+                              decoration: InputDecoration(
+                                labelText: 'Senha',
+                                prefixIcon: const Icon(Icons.lock_outline),
+                                border: const OutlineInputBorder(),
+                                suffixIcon: IconButton(
+                                  icon: Icon(_senhaVisivel
+                                      ? Icons.visibility_off
+                                      : Icons.visibility),
+                                  onPressed: () => setState(
+                                      () => _senhaVisivel = !_senhaVisivel),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'A senha é obrigatória';
+                                }
+                                if (value.length < 8) {
+                                  return 'A senha deve ter no mínimo 8 caracteres';
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+                          _fadeIn(
+                            ordem: 7,
+                            child: ElevatedButton(
+                              onPressed: _isLoading ? null : _handleRegister,
+                              style: ElevatedButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 16),
+                                backgroundColor: Colors.blueAccent,
+                                foregroundColor: Colors.white,
+                              ),
+                              child: const Text('Cadastrar',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 32),
-                      _fadeIn(
-                        ordem: 6,
-                        child: ElevatedButton(
-                          onPressed: _isLoading ? null : _handleRegister,
-                          child: const Text('Cadastrar'),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -247,7 +344,7 @@ class _RegisterClientScreenState extends State<RegisterClientScreen> {
         ),
         if (_isLoading)
           Container(
-            color: Colors.black.withAlpha(77), // .withOpacity(0.3)
+            color: Colors.black.withOpacity(0.3),
             child: const Center(child: CircularProgressIndicator()),
           ),
       ],

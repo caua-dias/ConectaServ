@@ -13,6 +13,7 @@ import '../features/auth/presentation/pages/search_results_page.dart';
 import '../features/auth/presentation/pages/company_profile_page.dart';
 import '../features/auth/presentation/pages/reviews_page.dart';
 import '../features/auth/presentation/pages/settings_page.dart';
+import '../features/auth/presentation/pages/register_service_page.dart';
 
 import '../features/models/presentation/notifiers/auth_notifier.dart';
 
@@ -111,6 +112,10 @@ GoRouter criarRouter(AuthNotifier authNotifier) {
       GoRoute(
         path: '/recover_password',
         builder: (context, state) => const RecoverPasswordPage(),
+      ),
+      GoRoute(
+        path: '/novo_servico',
+        builder: (context, state) => const RegisterServicePage(),
       ),
     ],
   );
